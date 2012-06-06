@@ -22,10 +22,14 @@ module.exports = function(grunt) {
                 noarg: true,
                 sub: true,
                 undef: true,
-                boss: true,
-                eqnull: true,
+                boss: false,
+                eqnull: false,
                 node: true,
-                browser: true
+                browser: true,
+                shadow: false,
+                white: true,
+                trailing: true,
+                indent: 4
             },
             globals: {
                 WCP: true,
