@@ -18,7 +18,6 @@ domplayerlist = document.getElementById('playerlist');
 WCP.setCanvas("game", 800, 800);
 
 var scRace = new WCP.Scene({
-    refreshRate: 10,
 	init : function() {
 
 		WCP.on('keydown', function(event){
@@ -41,12 +40,8 @@ var scRace = new WCP.Scene({
 				me.rotation = 0;
 			}
 		});
-        window.setInterval(function() {
-            socket.emit('move', me);
-        }, 100);
 	},
 	loop : function() {
-        //socket.emit('move', me);
 		if (me.rotation === 1) {
 			me.angle -= (0.1 * ROTATION_FACTOR);
 		} else if (me.rotation === -1) {
@@ -55,12 +50,13 @@ var scRace = new WCP.Scene({
 		if (me.go) {
 			me.pos.y += Math.round(Math.cos(me.angle) * SPEED_FACTOR);
 			me.pos.x += Math.round(Math.sin(me.angle) * SPEED_FACTOR);
-			//socket.emit('move', me);
+            window.setTimeout(function() {
+                socket.emit('move', me);
+            }, 100);
 		}
 		new WCP.Draw.circle(me.pos.x, me.pos.y, 10).draw();
 		new WCP.Draw.circle(me.pos.x + ( Math.sin(me.angle) * 5), me.pos.y + ( Math.cos(me.angle) * 5), 2, "top").draw();
 		for (var i = 0; i < player.length; i++) {
-			//console.log(player[i].name, player[i].pos.x);
 			if (player[i].name !== me.name) {
 				var p = player[i].pos;
 				new WCP.Draw.circle(p.x, p.y, 10).draw();
@@ -74,14 +70,9 @@ WCP.listen();
 socket.on('welcome', function (data) {
     data = JSON.parse(data);
 	console.log(data.msg);
-	//player = data.other;
 	me = data.you;
     console.log("me", me);
 	domplayerlist.innerHTML = player.length;
-	/*
-	window.setInterval(function(){
-		socket.emit('move', me);
-	}, 100);*/
 	WCP.startScene(scRace);
 });
 
@@ -99,5 +90,4 @@ socket.on('playerdisconnected', function(p) {
 
 socket.on('playeractualise', function(p) {
 	player = p;
-    //socket.emit('move', me);
 });

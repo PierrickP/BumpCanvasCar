@@ -35,9 +35,7 @@ app.get('/', function (req, res) {
 
 io.configure(function () { 
   io.set("transports", ["websocket"]); 
-  io.set("polling duration", 3);
-  io.set("close timeout", 5);
-  
+  io.set("polling duration", 3);  
 });
 
 function Player (s, n) {
@@ -63,9 +61,7 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('move', function (p){
-        //console.log('move', p);
         for (var i = 0; i < players.length; i++) {
-            //console.log(players[i].name, p.name)
             if (players[i].name == p.name) {
                 players[i].pos.x = p.pos.x;
                 players[i].pos.y = p.pos.y;
@@ -81,5 +77,3 @@ io.sockets.on('connection', function (socket) {
     });
     
 });
-
-//setInterval(function(){io.sockets.volatile.emit('playeractualise', players);/*console.log("seeeeeend");*/}, 2000);
