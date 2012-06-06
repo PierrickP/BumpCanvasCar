@@ -1,6 +1,6 @@
 /*
- * CanvasRace
- * https://github.com/Pierrick/CanvasRace
+ * BumpCanvasCar
+ * https://github.com/PierrickP/BumpCanvasCar
  *
  * Copyright (c) 2012 Pierrick PAUL
  * Licensed under the MIT license.
@@ -11,61 +11,75 @@ app = express.createServer(),
 io = require('socket.io').listen(app),
 fs = require('fs');
   
-var player = [];
+var players = [];
 
-app.listen(4242, "0.0.0.0");
+app.listen(process.env['app_port'] || 3000, "0.0.0.0");
 
 var deleteplayer = function (n) {
     var t = [];
-    for (var i = 0; i < player.length; i++ ) {
-        if (player[i].name !== n) {
-            t.push(player[i]);
+    for (var i = 0; i < players.length; i++ ) {
+        if (players[i].name !== n) {
+            t.push(players[i]);
         }
     }
     return t;
 };
 
 app.configure(function(){
-    app.use(express.static(__dirname + '/../client'));
+    app.use(express.static(__dirname + '/client'));
 });
 
 app.get('/', function (req, res) {
-    res.sendfile(__dirname + '/../index.html');
+    res.sendfile(__dirname + '/client/index.html');
 });
+
+io.configure(function () { 
+  io.set("transports", ["websocket"]); 
+  io.set("polling duration", 3);
+  io.set("close timeout", 5);
+  
+});
+
+function Player (s, n) {
+    this.socket = s.id;
+    this.name = n;
+    this.pos = {x: 200, y: 200};
+    this.rotation = 0;
+    this.angle = 0;
+    this.go = false;
+}
 
 io.sockets.on('connection', function (socket) {
     console.log("New player");
-    var newplayer = {name: socket.id, pos : {x: 200, y: 200}, rotation: 0, angle: 0, go : false};
-    player.push(newplayer);
-    socket.emit('welcome', {
+    var newplayer = new Player(socket, socket.id);
+    players.push(newplayer);
+    socket.emit('welcome', JSON.stringify({
         msg: 'Salut toi !',
         you :  newplayer,
-        other : player
-    });
-    socket.broadcast.emit('newplayer', socket.id, player, function() {
-        setTimeout(function(){io.sockets.emit('playeractualise', player);}, 100);
+        other : players
+    }));
+    socket.broadcast.emit('newplayer', socket.id, players, function() {
+        
     });
     
     socket.on('move', function (p){
         //console.log('move', p);
-        for (var i = 0; i < player.length; i++) {
-            //console.log(player[i].name, p.name)
-            if (player[i].name = p.name) {
-                //console.log("maj info player", player[i]);
-                player[i].pos.x = p.pos.x;
-                player[i].pos.y = p.pos.y;
+        for (var i = 0; i < players.length; i++) {
+            //console.log(players[i].name, p.name)
+            if (players[i].name == p.name) {
+                players[i].pos.x = p.pos.x;
+                players[i].pos.y = p.pos.y;
             }
         }
-        //socket.broadcast.emit('playeractualise', player);
+        socket.broadcast.emit('playeractualise', players);
     });
     
     socket.on('disconnect', function (name) {
-        player = deleteplayer(name); // fonctionne plus
+        players = deleteplayer(name); // fonctionne plus
         console.log("player dead");
-        io.sockets.emit('playerdisconnected', player);
+        io.sockets.emit('playerdisconnected', players);
     });
     
 });
 
-//setInterval(function(){io.sockets.emit('playeractualise', player)}, 3000);
-
+//setInterval(function(){io.sockets.volatile.emit('playeractualise', players);/*console.log("seeeeeend");*/}, 2000);

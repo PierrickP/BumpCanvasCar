@@ -1,15 +1,24 @@
+/*
+ * BumpCanvasCar
+ * https://github.com/PierrickP/BumpCanvasCar
+ *
+ * Copyright (c) 2012 Pierrick PAUL
+ * Licensed under the MIT license.
+ */
+
 "strict mode";
 
 var me = {},
-socket = io.connect('localhost'),
+socket = io.connect(),
 player = [],
-SPEED_FACTOR = 1.5,
-ROTATION_FACTOR = 1.3,
+SPEED_FACTOR = 3,
+ROTATION_FACTOR = 2,
 domplayerlist = document.getElementById('playerlist');
 
 WCP.setCanvas("game", 800, 800);
 
 var scRace = new WCP.Scene({
+    refreshRate: 10,
 	init : function() {
 
 		WCP.on('keydown', function(event){
@@ -32,16 +41,20 @@ var scRace = new WCP.Scene({
 				me.rotation = 0;
 			}
 		});
+        window.setInterval(function() {
+            socket.emit('move', me);
+        }, 100);
 	},
 	loop : function() {
+        //socket.emit('move', me);
 		if (me.rotation === 1) {
 			me.angle -= (0.1 * ROTATION_FACTOR);
 		} else if (me.rotation === -1) {
 			me.angle += (0.1 * ROTATION_FACTOR);
 		}
 		if (me.go) {
-			me.pos.y += Math.cos(me.angle) * SPEED_FACTOR;
-			me.pos.x += Math.sin(me.angle) * SPEED_FACTOR;
+			me.pos.y += Math.round(Math.cos(me.angle) * SPEED_FACTOR);
+			me.pos.x += Math.round(Math.sin(me.angle) * SPEED_FACTOR);
 			//socket.emit('move', me);
 		}
 		new WCP.Draw.circle(me.pos.x, me.pos.y, 10).draw();
@@ -59,14 +72,16 @@ var scRace = new WCP.Scene({
 WCP.listen();
 
 socket.on('welcome', function (data) {
-	console.log(data.msg, data.you.name);
-	player = data.other;
+    data = JSON.parse(data);
+	console.log(data.msg);
+	//player = data.other;
 	me = data.you;
+    console.log("me", me);
 	domplayerlist.innerHTML = player.length;
-	
+	/*
 	window.setInterval(function(){
 		socket.emit('move', me);
-	}, 100);
+	}, 100);*/
 	WCP.startScene(scRace);
 });
 
@@ -84,4 +99,5 @@ socket.on('playerdisconnected', function(p) {
 
 socket.on('playeractualise', function(p) {
 	player = p;
+    //socket.emit('move', me);
 });

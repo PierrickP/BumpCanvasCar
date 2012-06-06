@@ -16,6 +16,7 @@ A simple multiplayer Bump Car game
 ## How-to install
 
 ``git checkout ``
+
 ``npm install -g grunt`` 
  
 ## Contributing
