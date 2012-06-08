@@ -1,0 +1,61 @@
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/"><%= title %></a>
+      <div class="nav-collapse row">
+        <ul class="nav">
+          <li class="active"><a href="#">Home</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+		<ul class="nav perso">
+			<li><a href="/registration">registration</a></li>
+		</ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+<div class="container">
+
+  <!-- Main hero unit for a primary marketing message or call to action -->
+  <div class="hero-unit">
+    <h1>Registration</h1>
+    <h2>it's easy and fast !</h2>
+    <p>Create an account for save you profil.</p>
+	<form class="form-horizontal" method="post">
+	  <fieldset>
+		<legend>Account details</legend>
+		<div class="control-group">
+		  <label class="control-label" for="login">Login :</label>
+		  <div class="controls">
+			<input type="text" class="input-xlarge" id="login" name="user[login]">
+		  </div>
+		</div>
+		<div class="control-group">
+		  <label class="control-label" for="password">Password :</label>
+		  <div class="controls">
+			<input type="password" class="input-xlarge" id="password" name="user[password]">
+		  </div>
+		</div>
+		<div class="control-group">
+		  <label class="control-label" for="email" placeholder="exemple@exemple.com" >Email :</label>
+		  <div class="controls">
+			<input type="email" class="input-xlarge" id="email" name="user[email]">
+		  </div>
+		</div>
+		<p><input type="submit" class="btn btn-primary btn-large" value="Save my account"></input></p>
+	  </fieldset>
+	</form>
+  </div>
+  <hr>
+
+  <footer>
+    <p>&copy; Company 2012</p>
+  </footer>
+
+</div> <!-- /container -->
