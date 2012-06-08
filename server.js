@@ -13,8 +13,6 @@ fs = require('fs');
   
 var players = [];
 
-app.listen(process.env['app_port'] || 3000, "0.0.0.0");
-
 var deleteplayer = function (n) {
     var t = [];
     for (var i = 0; i < players.length; i++) {
@@ -34,7 +32,7 @@ app.get('/', function (req, res) {
 });
 
 io.configure(function () {
-    io.set("transports", ["websocket"]);
+    //io.set("transports", ["websocket"]);
     io.set("polling duration", 3);
 });
 
@@ -77,3 +75,5 @@ io.sockets.on('connection', function (socket) {
     });
     
 });
+
+app.listen(process.env['app_port'] || 3000);

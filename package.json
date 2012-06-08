@@ -6,7 +6,7 @@
   "author": {
     "name": "Pierrick PAUL",
     "email": "pierrick.paul@epitech.eu",
-    "url": "www.pierrickpaul.fr"
+    "url": "http://www.pierrickpaul.fr"
   },
   "repository": {
     "type": "git",
@@ -22,17 +22,19 @@
     }
   ],
   "engines": {
-    "node": "~0.6.15"
+    "node": "0.6.x"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "start": "server.js"
   },
   "dependencies": {
-	"socket.io": "0.9.x",
-	"express": "3.0.x"
+    "socket.io": "0.9.x",
+    "express": "2.5.x"
   },
   "devDependencies": {
     "grunt": "~0.3.9"
   },
-  "keywords": []
+  "keywords": [],
+  "subdomain": "bumpcanvascar"
 }
