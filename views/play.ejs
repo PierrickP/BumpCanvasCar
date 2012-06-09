@@ -6,12 +6,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </a>
-      <a class="brand" href="#"><%= title %></a>
-      <div class="nav-collapse">
+      <a class="brand" href="/"><%= title %></a>
+      <div class="nav-collapse row">
         <ul class="nav">
           <li><a href="/">Home</a></li>
           <li><a href="/players">Players</a></li>
-          <li><a href="/play">Play !</a></li>
+          <li class="active"><a href="/play">Play !</a></li>
           <li><a href="/about">About</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>
@@ -20,14 +20,22 @@
   </div>
 </div>
 <div class="container">
-	<div class="hero-unit">
-		<h1>404 Page  not found</h1>
-		<h2>Or destroyed by a Bump Car ... </h2>
-	</div>
-	<hr>
 
-	<footer>
-	<p>&copy; Company 2012</p>
-	</footer>
+  <!-- Main hero unit for a primary marketing message or call to action -->
+<div class="hero-unit">
+    <h1>BumpCanvasCar</h1>
+	<canvas id="game" style='border: 1px solid #333'></canvas>
+	<div id="playerlist"></div>
+	<script src="/socket.io/socket.io.js"></script>
+<script src="js/build-WCP-min.js"></script>
+	<script src="js/main.js"></script>
+</div>
+
+
+  <hr>
+
+  <footer>
+    <p>&copy; Company 2012</p>
+  </footer>
 
 </div> <!-- /container -->

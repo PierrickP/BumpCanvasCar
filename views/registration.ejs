@@ -9,12 +9,14 @@
       <a class="brand" href="/"><%= title %></a>
       <div class="nav-collapse row">
         <ul class="nav">
-          <li class="active"><a href="#">Home</a></li>
+          <li><a href="/">Home</a></li>
+          <li><a href="/players">Players</a></li>
+          <li><a href="/play">Play !</a></li>
           <li><a href="/about">About</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>
 		<ul class="nav perso">
-			<li><a href="/registration">registration</a></li>
+			<li class="active"><a href="/registration">registration</a></li>
 		</ul>
       </div><!--/.nav-collapse -->
     </div>
@@ -30,16 +32,18 @@
 	<form class="form-horizontal" method="post">
 	  <fieldset>
 		<legend>Account details</legend>
-		<div class="control-group">
+		<div class="control-group <% if( errors.name ) { %>error<% } %>">
 		  <label class="control-label" for="login">Login :</label>
 		  <div class="controls">
 			<input type="text" class="input-xlarge" id="login" name="user[login]">
+			<% if( errors.name ) { %><span class="help-inline"><%= errors.name.msg %></span><% } %>
 		  </div>
 		</div>
-		<div class="control-group">
+		<div class="control-group <% if( errors.password ) { %>error<% } %>">
 		  <label class="control-label" for="password">Password :</label>
 		  <div class="controls">
 			<input type="password" class="input-xlarge" id="password" name="user[password]">
+			<% if( errors.password ) { %><span class="help-inline"><%= errors.password.msg %></span><% } %>
 		  </div>
 		</div>
 		<div class="control-group">

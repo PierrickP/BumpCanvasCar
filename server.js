@@ -9,8 +9,18 @@
 var express = require('express'),
 app = express.createServer(),
 io = require('socket.io').listen(app),
-fs = require('fs');
-  
+fs = require('fs'),
+mongoose = require('mongoose'),
+crypto = require('crypto');
+
+var Schema = mongoose.Schema;
+
+var userSchema = new Schema({
+    name : String,
+    password : String,
+    email : String
+});
+var User = mongoose.model('User', userSchema);
 var players = [];
 
 /*
@@ -25,7 +35,7 @@ io.configure(function () {
 var locals = {
     title: 		 'BumpCanvasCar',
     description: 'A simple multiplayer Bump Car game',
-    author: 	 'Pierrick PAUL'
+    errors: {}
 };
 
 app.configure(function () {
@@ -39,7 +49,9 @@ app.configure(function () {
 });
 
 app.configure('development', function(){
-   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+    
+    //db = mongoserver.connect();
     // app.use(express.logger({ format: ':method :url' }));
 });
 
@@ -61,13 +73,67 @@ app.get('/', function (req, res) {
     res.render('index.ejs', locals);
 });
 
+app.get('/players', function (req, res) {
+    User.find({}, function (err, docs) {
+        var relocals = {
+            title : locals.title + " - players's list",
+            description: locals.description,
+            users : docs
+        };
+        res.render('players.ejs', relocals);    
+    });
+});
+
 app.get('/registration', function(req, res){
     res.render('registration.ejs', locals);
 });
 
 app.post('/registration', function(req, res){
-  console.log(req.body.user);
-  //res.redirect('/');
+    function send() {
+        if (password == "") {
+            errors.password = {msg : "Password required"};
+        }
+        console.log("la", errors);
+        if (!errors.password && !errors.name) {
+            var instance = new User();
+            instance.name = name;
+            instance.password = crypto.createHash('md5').update(password).digest("hex");
+            instance.email = req.body.user.email;
+            instance.save(function (err) {
+                locals.msg = "Thx for your registration";
+                res.render("play.ejs", locals)
+            });
+        } else {
+            var relocals = {
+                title : locals.title + " - registration",
+                description: locals.description,
+                errors : errors
+            };
+            res.render('registration.ejs', relocals);
+        }
+    }
+    
+    var errors = {};
+    console.log(req.body.user);
+    var name = req.body.user.login;
+    var password = req.body.user.password;
+    if (name ==  "") {
+        errors.name = {msg : "Name required"};
+        send();
+    } else {
+        User.count({name: name}, function(err, nb) {
+            console.log("count", err, nb);
+            if (nb >= 1) {
+                errors.name = {msg : "Name already use"};
+                console.log("ici", errors);
+            }
+            send();
+        });
+    }    
+});
+
+app.get('/play',  function(req, res) {
+    res.render("play.ejs", locals);
 });
 
 app.get('/*', function(req, res){
@@ -126,5 +192,7 @@ io.sockets.on('connection', function (socket) {
     
 });
 
+mongoose.connect('mongodb://localhost/bumpcanvascar');
 app.listen(process.env['app_port'] || 3000);
 console.log("Listening on port %d in %s mode", app.address().port, app.settings.env);
+
