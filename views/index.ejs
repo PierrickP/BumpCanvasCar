@@ -15,6 +15,7 @@
           <li><a href="/about">About</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>
+		<% if( session.name ) { %> <ul class="nav perso"> <li><a href="/me"><%= session.name %> </a></li><ul> <% } else {%>
 		<ul class="nav perso">
 			<form class="form-inline">
 			  <input type="text" class="input-small" placeholder="Email">
@@ -26,6 +27,7 @@
 			</form>
 			<li><a href="/registration">registration</a></li>
 		</ul>
+		<% } %>
       </div><!--/.nav-collapse -->
     </div>
   </div>

@@ -1,0 +1,57 @@
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="/"><%= title %></a>
+      <div class="nav-collapse row">
+        <ul class="nav">
+          <li><a href="/">Home</a></li>
+          <li><a href="/players">Players</a></li>
+          <li class="active"><a href="/play">Play !</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+<div class="container">
+
+  <!-- Main hero unit for a primary marketing message or call to action -->
+<div class="hero-unit">
+    <h1>Login</h1>
+	<form class="form-horizontal" method="post">
+	  <fieldset>
+		<legend>Logging to your account</legend>
+		<% if( errors.user ) { %><p><%= errors.user.msg %></p><% } %>
+		<div class="control-group <% if( errors.name ) { %>error<% } %>">
+		  <label class="control-label" for="login">Login :</label>
+		  <div class="controls">
+			<input type="text" class="input-xlarge" id="login" name="user[login]">
+			<% if( errors.name ) { %><span class="help-inline"><%= errors.name.msg %></span><% } %>
+		  </div>
+		</div>
+		<div class="control-group <% if( errors.password ) { %>error<% } %>">
+		  <label class="control-label" for="password">Password :</label>
+		  <div class="controls">
+			<input type="password" class="input-xlarge" id="password" name="user[password]">
+			<% if( errors.password ) { %><span class="help-inline"><%= errors.password.msg %></span><% } %>
+		  </div>
+		</div>
+		<p><input type="submit" class="btn btn-primary btn-large" value="Login"></input></p>
+	  </fieldset>
+	</form>
+</div>
+
+
+  <hr>
+
+  <footer>
+    <p>&copy; Company 2012</p>
+  </footer>
+
+</div> <!-- /container -->

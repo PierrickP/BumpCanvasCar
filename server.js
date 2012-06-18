@@ -35,17 +35,20 @@ io.configure(function () {
 var locals = {
     title: 		 'BumpCanvasCar',
     description: 'A simple multiplayer Bump Car game',
-    errors: {}
+    errors: {},
+    session: {}
 };
 
 app.configure(function () {
     app.set('views', __dirname + '/views');
     app.set('view engine', 'ejs');
     app.use(express.bodyParser());
+    app.use(express.cookieParser());
     app.use(express.methodOverride());
     app.use(express['static'](__dirname + '/static'));
-    app.use(app.router);
     app.enable("jsonp callback");
+    app.use(express.session({ secret: "keyboard cat" }));
+    app.use(app.router);
 });
 
 app.configure('development', function(){
@@ -69,6 +72,10 @@ app.error(function(err, req, res, next){
 */
 
 app.get('/', function (req, res) {
+    if (req.session) {
+        console.log(req.session);
+        locals.session.name = req.session.name; 
+    }
     locals.date = new Date().toLocaleDateString();
     res.render('index.ejs', locals);
 });
@@ -82,6 +89,58 @@ app.get('/players', function (req, res) {
         };
         res.render('players.ejs', relocals);    
     });
+});
+
+app.get('/login', function (req, res) {
+    res.render('login.ejs', locals);
+});
+
+app.post('/login', function (req, res) {
+    var name = req.body.user.login;
+    var password = req.body.user.password;
+    var error = {};
+    var relocals = {
+        title : locals.title + " - login",
+        description: locals.description,
+        errors : {}
+    };
+    if (name ==  "") {
+        relocals.errors.name = {msg : "Name required"};
+    }
+    if (password ==  "") {
+        relocals.errors.password = {msg : "Password required"};
+    }
+    if (name != "" && password != "") {
+        User.count({name: name, password: crypto.createHash('md5').update(password).digest("hex")}, function(err, nb) {
+            if (nb === 1) {
+                req.session.name = name;
+                res.redirect('/')
+            } else {
+                relocals.errors.user = {msg : "unknow user :("};
+                res.render('login.ejs', relocals);
+            }
+        });
+    } else {
+        res.render('login.ejs', relocals);
+    }
+});
+
+app.get('/player/:name', function (req, res) {
+    console.log("player -> "+req.params.name);
+    User.findOne({name: req.params.name},['name'],  function (err, docs){
+        //Control name
+        console.log(docs);
+        var relocals = {
+            title : locals.title + " - ",
+            description: locals.description,
+            user: docs
+        };
+        res.render('player.ejs', relocals);
+    });
+});
+
+app.get('/me', function (req, res) {
+    res.redirect('/player/'+req.session.name);
 });
 
 app.get('/registration', function(req, res){
@@ -129,7 +188,7 @@ app.post('/registration', function(req, res){
             }
             send();
         });
-    }    
+    }
 });
 
 app.get('/play',  function(req, res) {
@@ -192,7 +251,10 @@ io.sockets.on('connection', function (socket) {
     
 });
 
-mongoose.connect('mongodb://localhost/bumpcanvascar');
+var connection = mongoose.connect('mongodb://localhost/bumpcanvascar', function (err) {
+    console.error(err);
+});
+
 app.listen(process.env['app_port'] || 3000);
 console.log("Listening on port %d in %s mode", app.address().port, app.settings.env);
 
