@@ -35,6 +35,7 @@ io.configure(function () {
 var locals = {
     title: 		 'BumpCanvasCar',
     description: 'A simple multiplayer Bump Car game',
+    page: "",
     errors: {},
     session: {}
 };
@@ -67,83 +68,83 @@ app.error(function(err, req, res, next){
    res.render('500.ejs', { locals: { error: err },status: 500 });	
 });
 
+function checkSession(req, res, next) {
+    if (req.session ) {
+        locals.session.name = (req.session.name) ? req.session.name : ""; 
+    }
+    next();
+}
+
 /*
 *  Routing
 */
 
-app.get('/', function (req, res) {
-    if (req.session) {
-        console.log(req.session);
-        locals.session.name = req.session.name; 
-    }
+app.get('/', checkSession, function (req, res) {
     locals.date = new Date().toLocaleDateString();
     res.render('index.ejs', locals);
 });
 
-app.get('/players', function (req, res) {
+app.get('/players', checkSession, function (req, res) {
     User.find({}, function (err, docs) {
-        var relocals = {
-            title : locals.title + " - players's list",
-            description: locals.description,
-            users : docs
-        };
-        res.render('players.ejs', relocals);    
+        locals.title = "WeCanPlay";
+        locals.users = docs;
+        res.render('players.ejs', locals);    
     });
 });
 
-app.get('/login', function (req, res) {
+app.get('/login', checkSession, function (req, res) {
     res.render('login.ejs', locals);
 });
 
+app.get('/logout', checkSession, function (req, res) {
+    req.session.destroy();
+    res.redirect('/');
+});
+
 app.post('/login', function (req, res) {
+    console.log("here");
     var name = req.body.user.login;
     var password = req.body.user.password;
     var error = {};
-    var relocals = {
-        title : locals.title + " - login",
-        description: locals.description,
-        errors : {}
-    };
+    locals.title = "WeCanPlay - players's list";
+    locals.errors = {};
     if (name ==  "") {
-        relocals.errors.name = {msg : "Name required"};
+        locals.errors.name = {msg : "Name required"};
     }
     if (password ==  "") {
-        relocals.errors.password = {msg : "Password required"};
+        locals.errors.password = {msg : "Password required"};
     }
     if (name != "" && password != "") {
         User.count({name: name, password: crypto.createHash('md5').update(password).digest("hex")}, function(err, nb) {
             if (nb === 1) {
                 req.session.name = name;
-                res.redirect('/')
+                console.log('login OK -> ', req.session.name)
+                res.redirect('/');
             } else {
-                relocals.errors.user = {msg : "unknow user :("};
-                res.render('login.ejs', relocals);
+                locals.errors.user = {msg : "unknow user :("};
+                res.render('login.ejs', locals);
             }
         });
     } else {
-        res.render('login.ejs', relocals);
+        res.render('login.ejs', locals);
     }
 });
 
-app.get('/player/:name', function (req, res) {
+app.get('/player/:name', checkSession, function (req, res) {
     console.log("player -> "+req.params.name);
     User.findOne({name: req.params.name},['name'],  function (err, docs){
         //Control name
-        console.log(docs);
-        var relocals = {
-            title : locals.title + " - ",
-            description: locals.description,
-            user: docs
-        };
-        res.render('player.ejs', relocals);
+        console.log("Player details -> ", docs);
+        locals.user = docs
+        res.render('player.ejs', locals);
     });
 });
 
-app.get('/me', function (req, res) {
+app.get('/me', checkSession, function (req, res) {
     res.redirect('/player/'+req.session.name);
 });
 
-app.get('/registration', function(req, res){
+app.get('/registration', checkSession, function(req, res){
     res.render('registration.ejs', locals);
 });
 
@@ -163,12 +164,8 @@ app.post('/registration', function(req, res){
                 res.render("play.ejs", locals)
             });
         } else {
-            var relocals = {
-                title : locals.title + " - registration",
-                description: locals.description,
-                errors : errors
-            };
-            res.render('registration.ejs', relocals);
+            locals.errors = errors;
+            res.render('registration.ejs', locals);
         }
     }
     
@@ -191,11 +188,11 @@ app.post('/registration', function(req, res){
     }
 });
 
-app.get('/play',  function(req, res) {
+app.get('/play',  checkSession, function(req, res) {
     res.render("play.ejs", locals);
 });
 
-app.get('/*', function(req, res){
+app.get('/*', checkSession, function(req, res){
     res.render('404.ejs', locals);
 });
 
